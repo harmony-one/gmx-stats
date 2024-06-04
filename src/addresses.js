@@ -26,6 +26,16 @@ export const addresses = {
         GlpManager: '0x321F653eED006AD1C29D174e17d96351BDe22649'
     },
 
+    [HARMONY]: {
+        GMX: '0x3F1bEa7B9e2836C9B559c143f99d717aec6619dd',
+        BUSD: '0x1Aa1F7815103c0700b98f24138581b88d4cf9769',
+        WONE: '0xcF664087a5bB0237a0BAd6742852ec6c8d69A27a',
+        LINK: '0x218532a12a389a4a92fC0C5Fb22901D1c19198aA',
+        RewardReader: '0x820B9C96ac9afE46b4AfD8912A986f180e40df6b',
+        GLP: '0x1EE4a17871Aa61eF02B846795b7554aE7EAbb179',
+        GlpManager: '0xe51CB3361dE553fb7B75B49E5552e9D47B4aeDb0'
+    },
+
     [AVALANCHE]: {
         GMX: '0xfc5a1a6eb076a2c7ad06ed22c90d7e710e35ad0a',
         AVAX: '0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7',

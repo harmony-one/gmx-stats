@@ -71,7 +71,7 @@ export default function routes(app) {
       return
     }
     
-    const validSymbols = new Set(['BTC', 'ETH', 'BNB', 'UNI', 'LINK', 'AVAX'])
+    const validSymbols = new Set(['BUSD', 'WONE', 'LINK'])
     const symbol = req.params.symbol
     if (!validSymbols.has(symbol)) {
       next(createHttpError(400, `Invalid symbol ${symbol}`))
