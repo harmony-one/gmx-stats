@@ -33,7 +33,9 @@ export function csp(req, res, next) {
       "https://api.avax.network",
       "https://gmx-server-mainnet.uw.r.appspot.com",
       "https://api.coingecko.com",
-      "https://subgraph.satsuma-prod.com"
+      "https://subgraph.satsuma-prod.com",
+      "https://api.studio.thegraph.com",
+      "https://api.harmony.one",
     ]
   }
   if (!IS_PRODUCTION) {

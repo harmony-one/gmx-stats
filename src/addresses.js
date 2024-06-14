@@ -1,6 +1,7 @@
 export const BSC = 56
 export const ARBITRUM = 42161
 export const AVALANCHE = 43114
+export const HARMONY = 1666600000
 
 export const addresses = {
     [BSC]: {

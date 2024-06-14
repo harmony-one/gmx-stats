@@ -16,6 +16,7 @@ import GlpManager from '../abis/GlpManager.json'
 import Token from '../abis/v1/Token.json'
 
 const providers = {
+  harmony: new JsonRpcProvider('https://api.harmony.one'),
   arbitrum: new JsonRpcProvider('https://arb1.arbitrum.io/rpc'),
   avalanche: new JsonRpcProvider('https://api.avax.network/ext/bc/C/rpc')
 }
@@ -298,6 +299,10 @@ function getImpermanentLoss(change) {
 }
 
 function getChainSubgraph(chainName) {
+  if(chainName === "harmony" ) {
+    return "gmx-harmony-stats"
+  }
+
   return chainName === "arbitrum" ? "gmx-arbitrum-stats" : "gmx-avalanche-stats"
 }
 
@@ -311,8 +316,14 @@ export function useGraph(querySource, { subgraph = null, subgraphUrl = null, cha
     subgraphUrl = `https://subgraph.satsuma-prod.com/3b2ced13c8d9/gmx/${subgraph}/api`;
   }
 
+  subgraphUrl = "https://api.studio.thegraph.com/query/78881/gmx-h-stats/v0.0.6";
+
   const client = new ApolloClient({
-    link: new HttpLink({ uri: subgraphUrl, fetch }),
+    link: new HttpLink({ 
+      uri: subgraphUrl, 
+      credentials: 'same-origin',
+      fetch 
+    }),
     cache: new InMemoryCache()
   })
   const [data, setData] = useState()
@@ -447,8 +458,16 @@ export function useTradersData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = 
     }
   }) : null
 
-  if (data) {
-    const maxProfit = maxBy(data, item => item.profit).profit
+  if (data && data.length) {
+    let maxProfit;
+    
+    try {
+      maxProfit = maxBy(data, item => item.profit).profit
+    } catch (e) {
+      console.error(e);
+      maxProfit = 0;
+    }
+
     const maxLoss = minBy(data, item => item.loss).loss
     const maxProfitLoss = Math.max(maxProfit, -maxLoss)
 
@@ -1081,7 +1100,7 @@ export function useGlpPerformanceData(glpData, feesData, { from = FIRST_DATE_TS,
     const feesDataById = feesData.reduce((memo, item) => {
       memo[item.timestamp] = item
       return memo
-    })
+    }, {})
 
     let BTC_WEIGHT = 0
     let ETH_WEIGHT = 0

@@ -3,6 +3,7 @@ import { Route, Switch, NavLink, Redirect } from 'react-router-dom';
 import { motion, AnimatePresence } from "framer-motion";
 import cx from "classnames";
 import Arbitrum from './views/Arbitrum';
+import Harmony from './views/Harmony';
 import Referrals from './views/Referrals';
 import Avalanche from './views/Avalanche';
 import Trading from './views/Trading';
@@ -22,16 +23,19 @@ function AppHeaderLinks({ mode, small, clickCloseIcon }) {
           <div className="App-header-menu-icon-block" onClick={() => clickCloseIcon()}>
             <FiX className="App-header-menu-icon" />
           </div>
-          <NavLink exact activeClassName="active" className="App-header-link-main" to="/">
+          {/* <NavLink exact activeClassName="active" className="App-header-link-main" to="/">
             <img src={logoIcon} alt="GMX Logo" />
-          </NavLink>
+          </NavLink> */}
         </div>
       }
-      <div className="App-header-link-container">
+      {/* <div className="App-header-link-container">
         <NavLink to="/arbitrum" exact className="nav-link" activeClassName="active">Arbitrum</NavLink>
       </div>
       <div className="App-header-link-container">
         <NavLink to="/avalanche" className="nav-link">Avalanche</NavLink>
+      </div> */}
+      <div className="App-header-link-container">
+        <NavLink to="/harmony" className="nav-link">Harmony</NavLink>
       </div>
     </div>
   )
@@ -90,15 +94,16 @@ const App = () => {
                 {!isDrawerVisible && <RiMenuLine className="App-header-menu-icon" />}
                 {isDrawerVisible && <FaTimes className="App-header-menu-icon" />}
               </div>
-              <a href="https://gmx.io" target="_blank" className="nav-logo">
+              {/* <a href="https://gmx.io" target="_blank" className="nav-logo">
                 <img width="87" src={mode == 'dark' ? darkLogoIcon : lightLogoIcon} />
-              </a>
-              <NavLink to="/arbitrum" exact className="nav-link" activeClassName="active">Arbitrum</NavLink>
-              <NavLink to="/avalanche" className="nav-link">Avalanche</NavLink>
+              </a> */}
+              {/* <NavLink to="/arbitrum" exact className="nav-link" activeClassName="active">Arbitrum</NavLink>
+              <NavLink to="/avalanche" className="nav-link">Avalanche</NavLink> */}
+              <NavLink to="/harmony" className="nav-link">Harmony</NavLink>
             </div>
             <div className="nav-right">
-              <a href="https://gmx.io" target="_blank" className="nav-link">APP</a>
-              <a href="https://gmxio.gitbook.io/gmx/" target="_blank" className="nav-link">DOCS</a>
+              {/* <a href="https://gmx.io" target="_blank" className="nav-link">APP</a>
+              <a href="https://gmxio.gitbook.io/gmx/" target="_blank" className="nav-link">DOCS</a> */}
               <div className='modeselect' onClick={() => switchMode()}>
                 {mode == 'dark' ? <FaSun /> : <FaMoon />}
               </div>
@@ -121,18 +126,21 @@ const App = () => {
           </AnimatePresence>
           <div className="content">
             <Route path="/" exact>
-              <Redirect to="/arbitrum" />
+              <Redirect to="/harmony" />
             </Route>
-            <Route exact path="/arbitrum" render={(props) => (
+            {/* <Route exact path="/arbitrum" render={(props) => (
               <Arbitrum {...props} mode={mode} />
+            )} /> */}
+            <Route exact path="/harmony" render={(props) => (
+              <Harmony {...props} mode={mode} />
             )} />
-            <Route exact path="/avalanche" render={(props) => (
+            {/* <Route exact path="/avalanche" render={(props) => (
               <Avalanche {...props} mode={mode} />
             )} />
             <Route exact path="/referrals/:chainName" render={(props) => (
               <Referrals {...props} mode={mode} />
             )} />
-            <Route exact path="/trading" component={Trading} />
+            <Route exact path="/trading" component={Trading} /> */}
           </div>
         </div>
       }
