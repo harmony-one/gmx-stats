@@ -4,7 +4,7 @@ import { StaticRouter } from 'react-router-dom';
 import { renderToString } from 'react-dom/server';
 
 import { createHttpError }  from './utils';
-import { ARBITRUM, AVALANCHE } from './addresses'
+import { ARBITRUM, AVALANCHE, HARMONY } from './addresses'
 import { getPricesLimit, getLastUpdatedTimestamp, VALID_PERIODS } from './prices'
 import { get24HourVolume } from './stats'
 
@@ -71,14 +71,14 @@ export default function routes(app) {
       return
     }
     
-    const validSymbols = new Set(['BUSD', 'WONE', 'LINK'])
+    const validSymbols = new Set(['USDT', 'USDC', 'WONE', 'ONE', 'ETH', 'WBTC', 'BTC'])
     const symbol = req.params.symbol
     if (!validSymbols.has(symbol)) {
       next(createHttpError(400, `Invalid symbol ${symbol}`))
       return
     }
     const preferableChainId = Number(req.query.preferableChainId)
-    const validSources = new Set([ARBITRUM, AVALANCHE])
+    const validSources = new Set([ARBITRUM, AVALANCHE, HARMONY])
     if (!validSources.has(preferableChainId)) {
       next(createHttpError(400, `Invalid preferableChainId ${preferableChainId}. Valid options are ${ARBITRUM}, ${AVALANCHE}`))
       return

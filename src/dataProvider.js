@@ -300,11 +300,13 @@ function getImpermanentLoss(change) {
 
 function getChainSubgraph(chainName) {
   if(chainName === "harmony" ) {
-    return "gmx-harmony-stats"
+    return "gmx-h-stats"
   }
 
   return chainName === "arbitrum" ? "gmx-arbitrum-stats" : "gmx-avalanche-stats"
 }
+
+const SATSUMA_KEY = process.env.SATSUMA_KEY || ""; // "default" key
 
 export function useGraph(querySource, { subgraph = null, subgraphUrl = null, chainName = "arbitrum" } = {}) {
   const query = gql(querySource)
@@ -313,10 +315,11 @@ export function useGraph(querySource, { subgraph = null, subgraphUrl = null, cha
     if (!subgraph) {
       subgraph = getChainSubgraph(chainName)
     }
-    subgraphUrl = `https://subgraph.satsuma-prod.com/3b2ced13c8d9/gmx/${subgraph}/api`;
+
+    subgraphUrl = `https://api.studio.thegraph.com/query/${SATSUMA_KEY}/gmx-h-stats/v0.0.8`;
   }
 
-  subgraphUrl = "https://api.studio.thegraph.com/query/78881/gmx-h-stats/v0.0.6";
+  subgraphUrl = `https://api.studio.thegraph.com/query/${SATSUMA_KEY}/gmx-h-stats/v0.0.8`;
 
   const client = new ApolloClient({
     link: new HttpLink({ 
@@ -816,9 +819,9 @@ export function useFundingRateData({ from = FIRST_DATE_TS, to = NOW_TS, chainNam
 const MOVING_AVERAGE_DAYS = 7
 const MOVING_AVERAGE_PERIOD = 86400 * MOVING_AVERAGE_DAYS
 
-export function useVolumeData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "arbitrum" } = {}) {
+export function useVolumeData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "harmony" } = {}) {
 	const PROPS = 'margin liquidation swap mint burn'.split(' ')
-  const timestampProp = chainName === "arbitrum" ? "id" : "timestamp"
+  const timestampProp = chainName === "harmony" ? "id" : "timestamp"
   const query = `{
     volumeStats(
       first: 1000,

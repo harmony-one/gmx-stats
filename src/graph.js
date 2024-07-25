@@ -1,7 +1,7 @@
 import fetch from 'cross-fetch';
 import { ApolloClient, InMemoryCache, HttpLink } from '@apollo/client'
 
-import { ARBITRUM, AVALANCHE } from './addresses'
+import { ARBITRUM, AVALANCHE, HARMONY } from './addresses'
 
 const apolloOptions = {
   query: {
@@ -12,11 +12,17 @@ const apolloOptions = {
   }
 }
 
-const SATSUMA_KEY = process.env.SATSUMA_KEY || "3b2ced13c8d9"; // "default" key
+const SATSUMA_KEY = process.env.SATSUMA_KEY || ""; // "default" key
 
 function getSubgraphUrl(name) {
-  return `https://subgraph.satsuma-prod.com/${SATSUMA_KEY}/gmx/${name}/api`
+  return `https://api.studio.thegraph.com/query/${SATSUMA_KEY}/${name}/version/latest`
 }
+
+const harmonyStatsClient = new ApolloClient({
+  link: new HttpLink({ uri: getSubgraphUrl("gmx-h-stats"), fetch }),
+  cache: new InMemoryCache(),
+  defaultOptions: apolloOptions
+})
 
 const arbitrumStatsClient = new ApolloClient({
   link: new HttpLink({ uri: getSubgraphUrl("gmx-arbitrum-stats"), fetch }),
@@ -31,13 +37,21 @@ const avalancheStatsClient = new ApolloClient({
 })
   
 function getStatsClient(chainId) {
-  if (chainId === ARBITRUM) {
+  if (chainId === HARMONY) {
+    return harmonyStatsClient
+  } else if (chainId === ARBITRUM) {
     return arbitrumStatsClient
   } else if (chainId === AVALANCHE) {
     return avalancheStatsClient
   }
   throw new Error(`Invalid chainId ${chainId}`)
 }
+
+const harmonyPricesClient = new ApolloClient({
+  link: new HttpLink({ uri: getSubgraphUrl("gmx-h-prices"), fetch }),
+  cache: new InMemoryCache(),
+  defaultOptions: apolloOptions
+})
 
 const arbitrumPricesClient = new ApolloClient({
   link: new HttpLink({ uri: getSubgraphUrl("gmx-arbitrum-prices"), fetch }),
@@ -52,7 +66,9 @@ const avalanchePricesClient = new ApolloClient({
 })
 
 function getPricesClient(chainId) {
-  if (chainId === ARBITRUM) {
+  if (chainId === HARMONY) {
+    return harmonyPricesClient
+  } else if (chainId === ARBITRUM) {
     return arbitrumPricesClient
   } else if (chainId === AVALANCHE) {
     return avalanchePricesClient

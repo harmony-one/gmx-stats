@@ -4,7 +4,7 @@ import { getLogger } from './helpers'
 
 import TtlCache from './ttl-cache'
 import { getStatsClient } from './graph'
-import { ARBITRUM, AVALANCHE } from './addresses'
+import { HARMONY } from './addresses'
 
 const CACHE_TTL = 300
 const ttlCache = new TtlCache(CACHE_TTL, 10)
@@ -28,7 +28,7 @@ async function get24HourVolumeForChain(chainId) {
   const client = getStatsClient(chainId);
   const query = `{
     volumeStats(
-      orderBy: ${chainId === ARBITRUM ? "id" : "timestamp"},
+      orderBy: ${chainId === HARMONY ? "id" : "timestamp"},
       orderDirection: desc,
       first: 24
       where: { period: hourly }
@@ -40,7 +40,6 @@ async function get24HourVolumeForChain(chainId) {
       burn
     }
   }`;
-
 
   const { data } = await client.query({ query: gql(query) })
 
@@ -58,15 +57,13 @@ export async function get24HourVolume(useCache = true) {
   }
   
   logger.info('Requesting 24h volume from subgraphs')
-  const [arbitrumVolume, avalancheVolume] = await Promise.all([
-    get24HourVolumeForChain(ARBITRUM),
-    get24HourVolumeForChain(AVALANCHE)
+  const [harmonyVolume] = await Promise.all([
+    get24HourVolumeForChain(HARMONY),
   ]);
 
-  const totalVolume = arbitrumVolume.add(avalancheVolume);
+  const totalVolume = harmonyVolume;
   const ret = {
-    [ARBITRUM]: arbitrumVolume.toString(),
-    [AVALANCHE]: avalancheVolume.toString(),
+    [HARMONY]: harmonyVolume.toString(),
     total: totalVolume.toString()
   }
   ttlCache.set('24HourVolume', ret)
