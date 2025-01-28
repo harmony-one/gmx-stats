@@ -1,6 +1,7 @@
 export const BSC = 56
 export const ARBITRUM = 42161
 export const AVALANCHE = 43114
+export const HARMONY = 1666600000
 
 export const addresses = {
     [BSC]: {
@@ -24,6 +25,22 @@ export const addresses = {
         RewardReader: '0x8BFb8e82Ee4569aee78D03235ff465Bd436D40E0',
         GLP: '0x4277f8F2c384827B5273592FF7CeBd9f2C1ac258',
         GlpManager: '0x321F653eED006AD1C29D174e17d96351BDe22649'
+    },
+
+    [HARMONY]: {
+        WONE: '0xcF664087a5bB0237a0BAd6742852ec6c8d69A27a',
+        ONE: '0xcF664087a5bB0237a0BAd6742852ec6c8d69A27a',
+        USDT: '0xF2732e8048f1a411C63e2df51d08f4f52E598005',
+        USDC: '0xBC594CABd205bD993e7FfA6F3e9ceA75c1110da5',
+        ETH: '0x4cC435d7b9557d54d6EF02d69Bbf72634905Bf11',
+        BTC: '0x118f50d23810c5E09Ebffb42d7D3328dbF75C2c2',
+
+        GXP: '0x7C54F8d25F224DeE7A0FA7583f621E9AebE24DfE',
+        GMX: '0x9D609c2c561e31dC0B9664F060590de7953a215A',
+
+        RewardReader: '0x820B9C96ac9afE46b4AfD8912A986f180e40df6b',
+        GLP: '0x1EE4a17871Aa61eF02B846795b7554aE7EAbb179',
+        GlpManager: '0xe51CB3361dE553fb7B75B49E5552e9D47B4aeDb0'
     },
 
     [AVALANCHE]: {

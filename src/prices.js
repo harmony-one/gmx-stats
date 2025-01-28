@@ -2,7 +2,7 @@ import { gql } from '@apollo/client'
 
 import { getLogger } from './helpers'
 import TtlCache from './ttl-cache'
-import { addresses, ARBITRUM, AVALANCHE } from './addresses'
+import { addresses, ARBITRUM, AVALANCHE, HARMONY } from './addresses'
 import { toReadable, sleep } from './utils'
 import { getPricesClient } from './graph'
 import { isEqual } from 'lodash'
@@ -33,6 +33,7 @@ const VALID_PERIODS = new Set(Object.keys(PERIOD_TO_SECONDS))
 */
 const cachedPrices = {
   [ARBITRUM]: {},
+  [HARMONY]: {},
   [AVALANCHE]: {}
 }
 const candleByPriceId = {}
@@ -188,6 +189,9 @@ function getPricesFromTo(from, to, preferableChainId = ARBITRUM, symbol, period)
 }
 
 function getPrices(preferableChainId = ARBITRUM, symbol, period) {
+
+  console.log(addresses[preferableChainId]);
+
   const tokenAddress = addresses[preferableChainId][symbol]?.toLowerCase()
   if (!tokenAddress) {
     return []
@@ -229,16 +233,16 @@ async function loadNewPrices(chainId, period) {
     try {
       const query = getQuery()
       const start = Date.now()
-      logger.info("requesting prices for period %s", period)
+      // logger.info("requesting prices for period %s", period)
       const { data } = await graphClient.query({ query: gql(query) })
-      logger.info("request done in %sms loaded %s prices", Date.now() - start, data.priceCandles.length)
+      // logger.info("request done in %sms loaded %s prices", Date.now() - start, data.priceCandles.length)
       latestUpdateTimestamp = Math.floor(Date.now() / 1000)
       const prices = data.priceCandles
 
       if (prices.length === 0) {
         logger.info("No prices returned")
       } else {
-        logger.info("prices: %s", prices.length)
+        // logger.info("prices: %s", prices.length)
         putPricesIntoCache(prices, chainId, true)
       }
     } catch (ex) {
@@ -331,13 +335,17 @@ async function loadOldPrices(chainId, period) {
   }
 }
 
-if (IS_PRODUCTION || process.env.ENABLE_PRICES) {
+if (true || IS_PRODUCTION || process.env.ENABLE_PRICES) {
   for (const period of Object.keys(PERIOD_TO_SECONDS)) {
-    loadNewPrices(ARBITRUM, period)
-    loadNewPrices(AVALANCHE, period)
+    // loadNewPrices(ARBITRUM, period)
+    // loadNewPrices(AVALANCHE, period)
 
-    loadOldPrices(ARBITRUM, period)
-    loadOldPrices(AVALANCHE, period)
+    // loadOldPrices(ARBITRUM, period)
+    // loadOldPrices(AVALANCHE, period)
+
+    loadNewPrices(HARMONY, period)
+
+    loadOldPrices(HARMONY, period)
   }
 }
 

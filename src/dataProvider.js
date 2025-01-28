@@ -16,6 +16,7 @@ import GlpManager from '../abis/GlpManager.json'
 import Token from '../abis/v1/Token.json'
 
 const providers = {
+  harmony: new JsonRpcProvider('https://api.harmony.one'),
   arbitrum: new JsonRpcProvider('https://arb1.arbitrum.io/rpc'),
   avalanche: new JsonRpcProvider('https://api.avax.network/ext/bc/C/rpc')
 }
@@ -139,6 +140,11 @@ export const tokenDecimals = {
   "0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a": 18, // MIM
   "0x17fc002b466eec40dae837fc4be5c67993ddbd6f": 18, // FRAX
   "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1": 18, // DAI
+  
+  // Harmony
+  "0x1Aa1F7815103c0700b98f24138581b88d4cf9769": 18, // BUSD
+  "0x218532a12a389a4a92fC0C5Fb22901D1c19198aA": 18, // LINK
+  "0xcF664087a5bB0237a0BAd6742852ec6c8d69A27a": 18, // WONE
 }
 
 export const tokenSymbols = {
@@ -153,6 +159,11 @@ export const tokenSymbols = {
   '0xfea7a6a0b346362bf88a9e4a88416b77a57d6c2a': 'MIM',
   '0x17fc002b466eec40dae837fc4be5c67993ddbd6f': 'FRAX',
   '0xda10009cbd5d07dd0cecc66161fc93d7c9000da1': 'DAI',
+
+  // Harmony
+  "0x1Aa1F7815103c0700b98f24138581b88d4cf9769": 'BUSD',
+  "0x218532a12a389a4a92fC0C5Fb22901D1c19198aA": 'LINK',
+  "0xcF664087a5bB0237a0BAd6742852ec6c8d69A27a": 'WONE',
 
   // Avalanche
   '0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7': 'AVAX',
@@ -193,6 +204,17 @@ const knownSwapSources = {
     '0x6d7a3177f3500bea64914642a49d0b5c0a7dae6d': 'deBridge',
     '0xc30141b657f4216252dc59af2e7cdb9d8792e1b0': 'socket.tech',
     '0xdd94018f54e565dbfc939f7c44a16e163faab331': 'Odos Router'
+  },
+  harmony: {
+    '0x5D76ed731bC8Fb6eC50a0d4Bd39dA00A679E5a66': 'GMX Router', // Router
+    '0x45440437e3f8dF7B4b99f0CdCA6E14B46765d791': 'GMX OrderBook', // Orderbook
+    '0x98a00666cfcb2ba5a405415c2bf6547c63bf5491': 'GMX PositionManager A', // PositionManager old
+    '0x2500Fe3bb03B2B514b0BBF6d1Bd88A84298bBBee': 'GMX PositionManager B', // PositionManager
+    '0x75e42e6f01baf1d6022bea862a28774a9f8a4a0c': 'GMX PositionManager C', // PositionManager 12 oct 2022
+    '0x7119B1F55a949e4D5981c2C9d5dABd897f0feDfA': 'GMX PositionRouter C', // PositionRouter 12 oct 2022
+    '0xfa812ed63558f886d2F3Ac89984dfAe87E0D37f6': 'GMX OrderExecutor', // OrderExecutor
+    '0x820B9C96ac9afE46b4AfD8912A986f180e40df6b': 'GMX FastPriceFeed A', // FastPriceFeed
+    '0x1EE4a17871Aa61eF02B846795b7554aE7EAbb179': 'GMX PositionExecutor', // Position Executor
   },
   avalanche: {
     '0x4296e307f108b2f583ff2f7b7270ee7831574ae5': 'GMX OrderBook',
@@ -277,8 +299,14 @@ function getImpermanentLoss(change) {
 }
 
 function getChainSubgraph(chainName) {
+  if(chainName === "harmony" ) {
+    return "gmx-h-stats"
+  }
+
   return chainName === "arbitrum" ? "gmx-arbitrum-stats" : "gmx-avalanche-stats"
 }
+
+const SATSUMA_KEY = process.env.SATSUMA_KEY || ""; // "default" key
 
 export function useGraph(querySource, { subgraph = null, subgraphUrl = null, chainName = "arbitrum" } = {}) {
   const query = gql(querySource)
@@ -287,11 +315,18 @@ export function useGraph(querySource, { subgraph = null, subgraphUrl = null, cha
     if (!subgraph) {
       subgraph = getChainSubgraph(chainName)
     }
-    subgraphUrl = `https://subgraph.satsuma-prod.com/3b2ced13c8d9/gmx/${subgraph}/api`;
+
+    subgraphUrl = `https://api.studio.thegraph.com/query/${SATSUMA_KEY}/gmx-h-stats/v0.0.8`;
   }
 
+  subgraphUrl = `https://api.studio.thegraph.com/query/${SATSUMA_KEY}/gmx-h-stats/v0.0.8`;
+
   const client = new ApolloClient({
-    link: new HttpLink({ uri: subgraphUrl, fetch }),
+    link: new HttpLink({ 
+      uri: subgraphUrl, 
+      credentials: 'same-origin',
+      fetch 
+    }),
     cache: new InMemoryCache()
   })
   const [data, setData] = useState()
@@ -426,8 +461,16 @@ export function useTradersData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = 
     }
   }) : null
 
-  if (data) {
-    const maxProfit = maxBy(data, item => item.profit).profit
+  if (data && data.length) {
+    let maxProfit;
+    
+    try {
+      maxProfit = maxBy(data, item => item.profit).profit
+    } catch (e) {
+      console.error(e);
+      maxProfit = 0;
+    }
+
     const maxLoss = minBy(data, item => item.loss).loss
     const maxProfitLoss = Math.max(maxProfit, -maxLoss)
 
@@ -776,9 +819,9 @@ export function useFundingRateData({ from = FIRST_DATE_TS, to = NOW_TS, chainNam
 const MOVING_AVERAGE_DAYS = 7
 const MOVING_AVERAGE_PERIOD = 86400 * MOVING_AVERAGE_DAYS
 
-export function useVolumeData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "arbitrum" } = {}) {
+export function useVolumeData({ from = FIRST_DATE_TS, to = NOW_TS, chainName = "harmony" } = {}) {
 	const PROPS = 'margin liquidation swap mint burn'.split(' ')
-  const timestampProp = chainName === "arbitrum" ? "id" : "timestamp"
+  const timestampProp = chainName === "harmony" ? "id" : "timestamp"
   const query = `{
     volumeStats(
       first: 1000,
@@ -1060,7 +1103,7 @@ export function useGlpPerformanceData(glpData, feesData, { from = FIRST_DATE_TS,
     const feesDataById = feesData.reduce((memo, item) => {
       memo[item.timestamp] = item
       return memo
-    })
+    }, {})
 
     let BTC_WEIGHT = 0
     let ETH_WEIGHT = 0
